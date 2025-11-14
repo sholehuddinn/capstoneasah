@@ -1,0 +1,60 @@
+# node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun.lockb
+
+# ENVIRONMENT FILES
+.env
+.env.local
+.env.*
+!.env.example
+
+# BUILD / DIST
+dist/
+build/
+tmp/
+temp/
+.cache/
+coverage/
+.eslintcache
+.parcel-cache
+
+# DOCKER
+/docker/data/
+docker-compose.override.yml
+*.pid
+*.pid.lock
+
+# DATABASE & MIGRATION ARTIFACTS
+*.sqlite
+*.sqlite3
+*.db
+migrations/*.log
+
+# LOGS
+logs/
+*.log
+*.log.*
+debug.log
+
+# SYSTEM FILES
+.DS_Store
+Thumbs.db
+
+# VSCODE WORKSPACE
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# SENSITIVE CONFIG FILES
+src/config/db.js
+src/config/redis.js
+*.key
+*.pem
+
+# OTHER IGNORES
+*.tmp
+*.swp

@@ -1,0 +1,28 @@
+{
+  "name": "bun-express-pg-redis",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bunx nodemon src/app.js",
+    "start": "bun src/app.js",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "migrate:create": "node-pg-migrate create"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "bcryptjs": "^3.0.3",
+    "config": "^4.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "dotenv-expand": "^12.0.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^5.1.6",
+    "node-fetch": "^3.3.2",
+    "node-pg-migrate": "^8.0.3",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.3",
+    "redis": "^5.9.0"
+  }
+}
