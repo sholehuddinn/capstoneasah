@@ -50,8 +50,6 @@ Thumbs.db
 !.vscode/extensions.json
 
 # SENSITIVE CONFIG FILES
-src/config/db.js
-src/config/redis.js
 *.key
 *.pem
 

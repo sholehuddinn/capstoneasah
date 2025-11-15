@@ -37,7 +37,7 @@ export const authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    console.error("❌ [authMiddleware Error]", err);
+    console.error("[authMiddleware Error]", err);
     return res.status(500).json({ error: "Terjadi kesalahan saat memverifikasi token" });
   }
 };

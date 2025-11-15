@@ -14,6 +14,29 @@ export const tutorialOrder = [
   "35793"
 ];
 
+export const findProgressByUserId = async (user_id) => {
+  try {
+    const query = `
+      SELECT *
+      FROM progress
+      WHERE user_id = $1
+      LIMIT 1
+    `;
+
+    const result = await db.query(query, [user_id]);
+
+    if (result.rowCount === 0) {
+      throw new Error("Progress user tidak ditemukan.");
+    }
+
+    return result.rows[0];
+
+  } catch (error) {
+    console.error("Error getProgress:", error.message);
+    return null;
+  }
+};
+
 export const createProgress = async (user_id) => {
   try {
     const id = nanoid(10);

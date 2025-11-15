@@ -1,21 +1,30 @@
 import { generateAssessments } from "../services/assessmentService.js";
+import { verifyProgress } from "../models/progress.js";
 
 export const createAssessment = async (req, res) => {
   try {
     const { tutorial_id } = req.params;
+    const user_id = req.user.id;
+
+    const verif = verifyProgress(user_id, tutorial_id);
+     if (!verif) {
+      return res.status(403).json({
+        success: false,
+        error: "Kamu belum menyelesaikan tutorial sebelumnya.",
+      });
+    }
 
     const result = await generateAssessments(tutorial_id);
 
     return res.status(200).json({
       success: true,
       message: `Berhasil generate ${result.count} soal.`,
-      assessment_id: result.key, 
+      assessment_id: result.key,
       materi_id: result.materi_key,
-      expires_in: "120s",    
+      expires_in: "120s",
       total: result.count,
       data: result.data,
     });
-
   } catch (err) {
     console.error("Error di controller:", err);
 
