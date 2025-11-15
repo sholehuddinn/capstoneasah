@@ -33,7 +33,6 @@ Dockerfile
 *.sqlite
 *.sqlite3
 *.db
-migrations/*.log
 
 # LOGS
 logs/
