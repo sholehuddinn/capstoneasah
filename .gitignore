@@ -24,7 +24,8 @@ coverage/
 
 # DOCKER
 /docker/data/
-docker-compose.override.yml
+docker-compose.yml
+Dockerfile
 *.pid
 *.pid.lock
 

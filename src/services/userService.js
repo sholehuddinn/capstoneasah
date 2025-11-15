@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import { create, findByUsernameModel } from "../models/user.js";
+import { createPreference } from "../models/preference.js";
+import { createProgress } from "../models/progress.js";
 
 export const findUserByUsername = async (username) => {
   try {
@@ -14,6 +16,9 @@ export const createUser = async (name, username, password) => {
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await create(name, username, hashed);
+
+    await createPreference(user.id);
+    await createProgress(user.id)
 
     return user;
   } catch (error) {

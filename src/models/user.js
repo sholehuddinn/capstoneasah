@@ -1,6 +1,5 @@
 import { db } from "../config/db.js";
 import { nanoid } from "nanoid";
-import { createPreference } from "./preference.js";
 
 export const findByUsernameModel = async (username) => {
   try {
@@ -24,8 +23,6 @@ export const create = async (name, username, hashedPassword) => {
        RETURNING id, name, username, created_at`,
       [id, name, username, hashedPassword]
     );
-
-    await createPreference(id);
 
     return result.rows[0];
   } catch (err) {

@@ -8,6 +8,7 @@ import { getTutorialId, getTutorials } from '../controller/tutorialController.js
 import { registerUser, loginUser, getProfile } from '../controller/userController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { editPreferenceController } from '../controller/preferenceController.js';
+import { resetProgressController } from "../controller/progressController.js"
 
 router.get('/', (req, res) => res.send('Wellcome to the API Capstone Project'));
 router.get('/test', testConnection);
@@ -19,5 +20,6 @@ router.get('/tutorials/:id', authMiddleware, getTutorialId);
 router.get('/tutorials', authMiddleware, getTutorials);
 router.get('/assessment/tutorial/:tutorial_id', authMiddleware, createAssessment);
 router.post("/submit/tutorial/:tutorial_id/assessment/:assessment_id", authMiddleware, handleFeedback);
+router.get('/progress-reset', authMiddleware, resetProgressController);
 
 export default router;
