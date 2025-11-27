@@ -19,6 +19,7 @@ export const generateAssessments = async (tutorial, user_id) => {
     const prompt = `
     Berdasarkan materi berikut, buatkan 4 soal pilihan ganda untuk asesmen pembelajaran.
     Tiap soal harus memiliki 4 opsi jawaban (A, B, C, D) dan jelaskan alasan benar/salahnya.
+    Pastikan Kamu Membuat soal tidak keluar dari konteks materi yang aku berikan.
 
     === Materi ===
     ${cachedTutorial}
