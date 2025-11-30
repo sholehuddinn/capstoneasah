@@ -4,6 +4,7 @@ import {
   verifyUser,
 } from "../services/userService.js";
 import { getPreference } from "../services/preferenceService.js";
+import { getProgress } from "../services/progressService.js";
 import { generateToken } from "../utils/token.js";
 
 export const registerUser = async (req, res) => {
@@ -61,12 +62,14 @@ export const loginUser = async (req, res) => {
     user.token = token;
 
     const preference = await getPreference(user.id);
+    const ServiceGetProgress = await getProgress(user.id);
 
     return res.status(200).json({ 
       success: true,
       message: "Login berhasil",
       user: user,
-      preference: preference
+      preference: preference,
+      progress: ServiceGetProgress
     });
   } catch (error) {
     console.error("Error logging in user:", error);
@@ -84,12 +87,14 @@ export const getProfile = async (req, res, next) => {
   try {
 
     const preference = await getPreference(req.user.id);
+    const ServiceGetProgress = await getProgress(req.user.id);
 
     res.status(200).json({
       success: true,
       message: "Data profil berhasil diambil",
       user: req.user,
-      preference: preference
+      preference: preference,
+      progress: ServiceGetProgress
     });
   } catch (err) {
     res.json({ error: err.message })
