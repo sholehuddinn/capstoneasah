@@ -1,22 +1,31 @@
 import { redisClient } from "../config/redis";
 
-export const fetchTutorials = async (id) => {
+export const fetchAllTutorialsFromCache = async () => {
   try {
-    const cachedTutorials = await redisClient.get(`tutorials`);
+    const keys = await redisClient.keys("tutorial:*");
 
-    if (cachedTutorials) {
-      return JSON.parse(cachedTutorials);
+    if (!keys.length) {
+      return []; 
     }
 
-    const response = await fetch(`${process.env.API_DICODING}/tutorials`);
-    const tutorials = await response.json();
+    const values = await Promise.all(keys.map(key => redisClient.get(key)));
 
-    await redisClient.set(`tutorials`, JSON.stringify(tutorials), { EX: 3600 });
+    const tutorials = values
+      .map(val => {
+        try {
+          return JSON.parse(val);
+        } catch (e) {
+          return null;
+        }
+      })
+      .filter(Boolean);
+
     return tutorials;
+
   } catch (error) {
     throw error;
   }
-}
+};
 
 export const fetchTutorialId = async (id) => {
   try {
