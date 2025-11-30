@@ -1,6 +1,6 @@
 import { redisClient } from "../config/redis";
 
-export const fetchAllTutorialsFromCache = async () => {
+export const fetchTutorials = async () => {
   try {
     const keys = await redisClient.keys("tutorial:*");
 
