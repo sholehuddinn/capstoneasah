@@ -31,7 +31,6 @@ export const fetchTutorials = async () => {
 
     const tutorials = result.data.tutorials;
 
-    // 4. Cache setiap tutorial ke Redis (tutorial:id)
     for (const t of tutorials) {
       await redisClient.set(
         `tutorial:${t.id}`,
@@ -40,7 +39,6 @@ export const fetchTutorials = async () => {
       );
     }
 
-    // 5. Return hasil API
     return {
       status: "success",
       message: "OK (from API)",
