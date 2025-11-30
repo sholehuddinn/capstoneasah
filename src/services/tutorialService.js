@@ -4,23 +4,50 @@ export const fetchTutorials = async () => {
   try {
     const keys = await redisClient.keys("tutorial:*");
 
-    if (!keys.length) {
-      return []; 
+    if (keys.length > 0) {
+      const values = await Promise.all(keys.map(key => redisClient.get(key)));
+
+      const tutorials = values
+        .map(v => {
+          try {
+            return JSON.parse(v);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
+      return {
+        status: "success",
+        message: "OK (from cache)",
+        data: {
+          tutorials
+        }
+      };
     }
 
-    const values = await Promise.all(keys.map(key => redisClient.get(key)));
+    const response = await fetch(`${process.env.API_DICODING}/tutorials`);
+    const result = await response.json();
 
-    const tutorials = values
-      .map(val => {
-        try {
-          return JSON.parse(val);
-        } catch (e) {
-          return null;
-        }
-      })
-      .filter(Boolean);
+    const tutorials = result.data.tutorials;
 
-    return tutorials;
+    // 4. Cache setiap tutorial ke Redis (tutorial:id)
+    for (const t of tutorials) {
+      await redisClient.set(
+        `tutorial:${t.id}`,
+        JSON.stringify(t),
+        { EX: 3600 }
+      );
+    }
+
+    // 5. Return hasil API
+    return {
+      status: "success",
+      message: "OK (from API)",
+      data: {
+        tutorials
+      }
+    };
 
   } catch (error) {
     throw error;
