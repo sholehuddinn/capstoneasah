@@ -11,7 +11,9 @@ import { editPreferenceController } from '../controller/preferenceController.js'
 import { resetProgressController } from "../controller/progressController.js"
 import { getQuestionsByUser } from "../controller/questionController.js"
 
-router.get('/', (req, res) => res.send('Wellcome to the API Capstone Project'));
+router.get('/', (_req, res) => {
+  return res.redirect('https://documenter.getpostman.com/view/45729880/2sB3WmS28v');
+});
 router.get('/test', testConnection);
 router.post('/register', registerUser);
 router.post('/login', loginUser);
