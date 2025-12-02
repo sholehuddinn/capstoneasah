@@ -1,7 +1,7 @@
 import { redisClient } from '../config/redis.js';
 import { db } from '../config/db.js';
 
-export const testConnection = async (req, res) => {
+export const testConnection = async (_req, res) => {
   try {
     await redisClient.set('last_check', new Date().toISOString());
     const cache = await redisClient.get('last_check');

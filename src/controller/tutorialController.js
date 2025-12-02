@@ -1,7 +1,7 @@
 import { fetchTutorialId, fetchTutorials } from "../services/tutorialService";
 import { updateUserProgress } from "../services/progressService";
 
-export const getTutorials = async (req, res) => {
+export const getTutorials = async (_req, res) => {
   try {
     const tutorials = await fetchTutorials();
     res.status(200).json(tutorials);

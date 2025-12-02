@@ -83,7 +83,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-export const getProfile = async (req, res, next) => {
+export const getProfile = async (req, res) => {
   try {
 
     const preference = await getPreference(req.user.id);
