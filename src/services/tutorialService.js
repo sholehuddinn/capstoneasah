@@ -4,7 +4,7 @@ export const fetchTutorials = async () => {
   try {
     const keys = await redisClient.keys("tutorial:*");
 
-    if (keys.length > 10) {
+    if (keys.length >= 10) {
       const values = await Promise.all(keys.map(key => redisClient.get(key)));
 
       const tutorials = values

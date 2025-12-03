@@ -12,6 +12,7 @@ export const testConnection = async (_req, res) => {
       redis_cached_time: cache,
       db_current_time: currentTime
     });
+    
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
