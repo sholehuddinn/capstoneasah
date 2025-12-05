@@ -16,10 +16,26 @@ export const getTutorials = async (_req, res) => {
   }
 };
 
+const VALID_IDS = [
+  35363, 35368, 35373, 35378, 35383,
+  35398, 35403, 35793, 35408, 35428
+];
+
 export const getTutorialId = async (req, res) => {
   try {
 
     const { id } = req.params;
+
+    if (!id) return {};
+    
+    if (!VALID_IDS.includes(Number(id))) {
+      res.status(200).json({
+        succes: false,
+        message : "ID salah",
+        data: {}
+      });
+    }
+
     const user_id = req.user?.id;
     const tutorial = await fetchTutorialId(id);
 
