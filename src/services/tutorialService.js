@@ -61,7 +61,7 @@ export const fetchTutorialId = async (id) => {
 
     const response = await fetch(`${process.env.API_DICODING}/tutorials/${id}`);
 
-    if (result.status === "fail") {
+    if (result.ok) {
       const err = new Error(result.message || "Tutorial not found");
       err.statusCode = 404;
       throw err;
