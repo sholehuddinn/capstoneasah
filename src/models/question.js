@@ -36,7 +36,6 @@ export const findOne = async (user_id, tutorial_id) => {
   return res.rows[0];
 };
 
-// AMBIL SEMUA QUESTION BY USER
 export const findByUser = async (user_id) => {
   const res = await db.query(
     `SELECT * FROM question 
@@ -47,13 +46,11 @@ export const findByUser = async (user_id) => {
   return res.rows;
 };
 
-// HAPUS SEMUA QUESTION USER
 export const deleteQuestion = async (user_id) => {
   await db.query(`DELETE FROM question WHERE user_id = $1`, [user_id]);
   return true;
 };
 
-// CARI tutorial_id yang pernah dipakai user
 export const findTutorialByUser = async (user_id) => {
   const res = await db.query(
     `SELECT tutorial_id 
