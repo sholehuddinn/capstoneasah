@@ -8,9 +8,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const generateAssessments = async (tutorial, user_id) => {
   try {
+    const tutorialKey = `tutorial:${tutorial}`;
+
     const model = genAI.getGenerativeModel({ model: process.env.MODEL });
 
     const cachedTutorial = await fetchTutorialId(tutorial);
+
+    const materi = cachedTutorial.content ?? JSON.stringify(cachedTutorial);
 
     const prompt = `
     Berdasarkan materi berikut, buatkan 4 soal pilihan ganda untuk asesmen pembelajaran.
@@ -18,7 +22,7 @@ export const generateAssessments = async (tutorial, user_id) => {
     Pastikan Kamu Membuat soal tidak keluar dari konteks materi yang aku berikan.
 
     === Materi ===
-    ${cachedTutorial}
+    ${materi}
 
     === Format JSON WAJIB (tanpa tambahan teks) ===
     [
