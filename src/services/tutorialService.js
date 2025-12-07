@@ -54,16 +54,10 @@ export const fetchTutorials = async () => {
 
 export const fetchTutorialId = async (id) => {
   try {
-    const cachedTutorial = await redisClient.get(`tutorial:${id}`);
-
-    if (cachedTutorial) {
-      return JSON.parse(cachedTutorial);
-    }
 
     const response = await fetch(`${process.env.API_DICODING}/tutorials/${id}`);
     const tutorial = await response.json();
 
-    await redisClient.set(`tutorial:${id}`, JSON.stringify(tutorial), { EX: 3600 });
     return tutorial;
   } catch (error) {
     throw error;
