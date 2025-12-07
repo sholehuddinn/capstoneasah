@@ -1,18 +1,18 @@
 import { generateAssessments } from "../services/assessmentService.js";
-import { verifyProgress } from "../models/progress.js";
+// import { verifyProgress } from "../models/progress.js";
 
 export const createAssessment = async (req, res) => {
   try {
     const { tutorial_id } = req.params;
     const user_id = req.user.id;
 
-    const verif = verifyProgress(user_id, tutorial_id);
-     if (!verif) {
-      return res.status(403).json({
-        success: false,
-        error: "Kamu belum menyelesaikan tutorial sebelumnya.",
-      });
-    }
+    // const verif = await verifyProgress(user_id, tutorial_id);
+    //  if (!verif) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     error: "Kamu belum menyelesaikan tutorial sebelumnya.",
+    //   });
+    // }
 
     const result = await generateAssessments(tutorial_id, user_id);
 
