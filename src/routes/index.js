@@ -20,7 +20,7 @@ router.post('/login', loginUser);
 router.get('/users', authMiddleware, getProfile);
 router.patch('/users/preference', authMiddleware, editPreferenceController)
 router.get('/tutorials/:id', authMiddleware, getTutorialId);
-router.get('/tutorials', authMiddleware, getTutorials);
+// router.get('/tutorials', authMiddleware, getTutorials);
 router.get('/assessment/tutorial/:tutorial_id', authMiddleware, createAssessment);
 router.post("/submit/tutorial/:tutorial_id/assessment/:assessment_id", authMiddleware, handleFeedback);
 router.get('/progress-reset', authMiddleware, resetProgressController);
