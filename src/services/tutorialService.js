@@ -55,6 +55,10 @@ export const fetchTutorials = async () => {
 export const fetchTutorialId = async (id) => {
   try {
 
+    const time = new Date().toISOString();
+
+    console.log(`[FETCH] Tutorial ID: ${id} | Time: ${time}`);
+
     const response = await fetch(`${process.env.API_DICODING}/tutorials/${id}`);
     const tutorial = await response.json();
 
