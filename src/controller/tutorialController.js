@@ -23,36 +23,46 @@ const VALID_IDS = [
 
 export const getTutorialId = async (req, res) => {
   try {
-
     const { id } = req.params;
 
-    if (!id) return {};
-    
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "ID wajib diisi"
+      });
+    }
+
     if (!VALID_IDS.includes(Number(id))) {
-      res.status(200).json({
-        succes: false,
-        message : "ID salah",
+      return res.status(400).json({
+        success: false,
+        message: "ID salah",
         data: {}
       });
     }
 
     const user_id = req.user?.id;
+
     const tutorial = await fetchTutorialId(id);
+    if (!tutorial) {
+      return res.status(404).json({
+        success: false,
+        message: "Tutorial tidak ditemukan"
+      });
+    }
 
     const result = await updateUserProgress(user_id, id);
 
-    res.status(200).json({
+    return res.status(200).json({
+      success: true,
       tutorial: tutorial,
       progress: result
     });
 
   } catch (error) {
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Gagal mengambil data tutorial.",
       details: error.message,
     });
-
   }
-}
+};

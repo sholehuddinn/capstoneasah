@@ -59,13 +59,25 @@ export const fetchTutorialId = async (id) => {
       return JSON.parse(cachedTutorial);
     }
 
-    const response = await fetch(`${process.env.API_DICODING}/tutorials/${id}`);
+    const url = `${process.env.API_DICODING}/tutorials/${id}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error("API ERROR:", response.status);
+      return null;
+    }
 
     const tutorial = await response.json();
 
+    if (!tutorial || tutorial.success === false || Object.keys(tutorial).length === 0) {
+      return null;
+    }
+
     await redisClient.set(`tutorial:${id}`, JSON.stringify(tutorial), { EX: 3600 });
+
     return tutorial;
   } catch (error) {
-    throw error;
+    console.error("FETCH TUTORIAL ERROR:", error.message);
+    return null;
   }
 };
