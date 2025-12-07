@@ -1,7 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { nanoid } from "nanoid";
 import { redisClient } from "../config/redis.js";
-import { createQuestion, findOne } from "../models/question.js"; // <-- tambahkan
+import { createQuestion, findOne } from "../models/question.js";
+import { fetchTutorialId } from "./tutorialService.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -9,12 +10,7 @@ export const generateAssessments = async (tutorial, user_id) => {
   try {
     const model = genAI.getGenerativeModel({ model: process.env.MODEL });
 
-    const tutorialKey = `tutorial:${tutorial}`;
-    const cachedTutorial = await redisClient.get(tutorialKey);
-
-    if (!cachedTutorial) {
-      throw new Error("Materi tutorial tidak ditemukan atau kosong.");
-    }
+    const cachedTutorial = await fetchTutorialId(tutorial);
 
     const prompt = `
     Berdasarkan materi berikut, buatkan 4 soal pilihan ganda untuk asesmen pembelajaran.
