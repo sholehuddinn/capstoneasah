@@ -56,6 +56,10 @@ export const fetchTutorialId = async (id) => {
   try {
     const cachedTutorial = await redisClient.get(`tutorial:${id}`);
 
+    const time = new Date().toISOString();
+
+    console.log(`[FETCH] Tutorial ID: ${id} | Time: ${time}`);
+
     if (cachedTutorial) {
       return JSON.parse(cachedTutorial);
     }
