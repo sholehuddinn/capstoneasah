@@ -1,8 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { nanoid } from "nanoid";
 import { redisClient } from "../config/redis.js";
-import { createQuestion, findOne } from "../models/question.js";
-import { fetchTutorialId } from "./tutorialService.js";
+import { createQuestion, findOne } from "../models/question.js"; 
+
+import 'dotenv/config';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -11,87 +12,56 @@ export const generateAssessments = async (tutorial, user_id) => {
     const model = genAI.getGenerativeModel({ model: process.env.MODEL });
 
     const tutorialKey = `tutorial:${tutorial}`;
+    const cachedTutorial = await redisClient.get(tutorialKey);
 
-    // ✅ Ambil tutorial & simpan ke Redis
-    const cachedTutorial = await fetchTutorialId(tutorial);
-    await redisClient.set(tutorialKey, JSON.stringify(cachedTutorial), { EX: 3600 });
-
-    const materi = cachedTutorial.content ?? JSON.stringify(cachedTutorial);
+    if (!cachedTutorial) {
+      throw new Error("Materi tutorial tidak ditemukan atau kosong.");
+    }
 
     const prompt = `
     Berdasarkan materi berikut, buatkan 4 soal pilihan ganda untuk asesmen pembelajaran.
     Tiap soal harus memiliki 4 opsi jawaban (A, B, C, D) dan jelaskan alasan benar/salahnya.
-    Pastikan Kamu Membuat soal tidak keluar dari konteks materi yang aku berikan.
 
     === Materi ===
-    ${materi}
+    ${cachedTutorial}
 
-    === Format JSON WAJIB ===
+    === Format JSON WAJIB (tanpa tambahan teks) ===
     [
       {
-        "assessment": "Teks soal",
+        "assessment": "Teks soal di sini",
         "multiple_choice": [
-          { "id": 1, "option": "Opsi A", "correct": true, "explanation": "Alasan" },
-          { "id": 2, "option": "Opsi B", "correct": false, "explanation": "Alasan" },
-          { "id": 3, "option": "Opsi C", "correct": false, "explanation": "Alasan" },
-          { "id": 4, "option": "Opsi D", "correct": false, "explanation": "Alasan" }
+          { "id": 1, "option": "Teks opsi A", "correct": true/false, "explanation": "Penjelasan agak panjang" },
+          { "id": 2, "option": "Teks opsi B", "correct": true/false, "explanation": "Penjelasan agak panjang" },
+          { "id": 3, "option": "Teks opsi C", "correct": true/false, "explanation": "Penjelasan agak panjang" },
+          { "id": 4, "option": "Teks opsi D", "correct": true/false, "explanation": "Penjelasan agak panjang" }
         ]
       }
     ]
+
+    Output HARUS berupa array JSON valid tanpa markdown atau teks lain.
     `;
 
-    // ✅ HYBRID: GEMINI → MOCK
-    let parsed;
+    let result;
     try {
-      const result = await model.generateContent(prompt);
-      const text = result.response.text().replace(/```json|```/g, "").trim();
-      parsed = JSON.parse(text);
-      console.log("✅ Assessment source: GEMINI");
+      result = await model.generateContent(prompt);
     } catch (apiErr) {
-      console.warn("⚠️ Gemini gagal, pakai MOCK:", apiErr.message);
-
-      // ✅ MOCK DATA (ANTI 500)
-      parsed = [
-        {
-          assessment: "Apa fungsi utama Redis?",
-          multiple_choice: [
-            { id: 1, option: "Database relasional", correct: false, explanation: "Redis bukan SQL" },
-            { id: 2, option: "In-memory cache", correct: true, explanation: "Redis adalah cache" },
-            { id: 3, option: "Web server", correct: false, explanation: "Redis bukan web server" },
-            { id: 4, option: "Load balancer", correct: false, explanation: "Redis bukan load balancer" }
-          ]
-        },
-        {
-          assessment: "Docker digunakan untuk?",
-          multiple_choice: [
-            { id: 1, option: "Virtualisasi container", correct: true, explanation: "Docker berbasis container" },
-            { id: 2, option: "Desain UI", correct: false, explanation: "Bukan UI" },
-            { id: 3, option: "Manajemen database", correct: false, explanation: "Bukan DBMS" },
-            { id: 4, option: "Web scraping", correct: false, explanation: "Bukan scraper" }
-          ]
-        },
-        {
-          assessment: "Apa kepanjangan API?",
-          multiple_choice: [
-            { id: 1, option: "Application Program Interface", correct: false, explanation: "Kurang tepat" },
-            { id: 2, option: "Application Programming Interface", correct: true, explanation: "Benar" },
-            { id: 3, option: "Applied Program Integration", correct: false, explanation: "Salah" },
-            { id: 4, option: "Application Process Integration", correct: false, explanation: "Salah" }
-          ]
-        },
-        {
-          assessment: "Fungsi utama Redis di backend?",
-          multiple_choice: [
-            { id: 1, option: "Authentication", correct: false, explanation: "Bukan fungsi utama" },
-            { id: 2, option: "Authorization", correct: false, explanation: "Bukan fungsi utama" },
-            { id: 3, option: "Caching dan message broker", correct: true, explanation: "Ini fungsi utama Redis" },
-            { id: 4, option: "Web scraping", correct: false, explanation: "Bukan scraper" }
-          ]
-        }
-      ];
+      console.error("Gagal memanggil Gemini API:", apiErr.message);
+      throw new Error("Gagal menghubungi Gemini API — coba beberapa saat lagi.");
     }
 
-    // ✅ Normalisasi data
+    if (!result || !result.response || typeof result.response.text !== "function") {
+      throw new Error("Respons dari Gemini API tidak valid.");
+    }
+
+    let text = result.response.text().replace(/```json|```/g, "").trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch (err) {
+      throw new Error("Format JSON tidak valid. Output mentah: " + text);
+    }
+
     const data = parsed.map((q, index) => ({
       id: nanoid(8),
       assessment: q.assessment,
@@ -107,8 +77,8 @@ export const generateAssessments = async (tutorial, user_id) => {
       expires_at: new Date(Date.now() + 120000).toISOString(),
     }));
 
-    // ✅ Simpan soal pertama ke DB
-    const firstQuestion = data[0];
+    const firstQuestion = data[0]; 
+
     const exists = await findOne(user_id, tutorial);
 
     if (!exists) {
@@ -126,8 +96,8 @@ export const generateAssessments = async (tutorial, user_id) => {
       });
     }
 
-    // ✅ Simpan sisa soal ke Redis
-    const remaining = data.slice(1);
+    const remaining = data.slice(1); 
+
     const redisKey = `assessment:${nanoid(6)}`;
     await redisClient.set(redisKey, JSON.stringify(remaining), { EX: 120 });
 
