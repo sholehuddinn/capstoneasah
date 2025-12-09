@@ -1,7 +1,5 @@
 import { redisClient } from "../config/redis.js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+import { generateAI } from "./generateAiService.js";
 
 export const submitFeedback = async (assessmentKey, tutorialKey, answers) => {
   try {
@@ -42,45 +40,50 @@ export const submitFeedback = async (assessmentKey, tutorialKey, answers) => {
         : `${elapsedSeconds} detik`;
 
     const prompt = `
-    Materi pembelajaran siswa:
-    ${materiData.isi || materiData.text || JSON.stringify(materiData)}
+Materi pembelajaran siswa:
+${materiData.isi || materiData.text || JSON.stringify(materiData)}
 
-    Berdasarkan hasil asesmen siswa berikut:
-    - Jumlah soal: ${total}
-    - Jawaban benar: ${benar}
-    - Skor: ${score}%
+Berdasarkan hasil asesmen siswa berikut:
+- Jumlah soal: ${total}
+- Jawaban benar: ${benar}
+- Skor: ${score}%
 
-    Berikan umpan balik pembelajaran **yang relevan dengan materi di atas**.
-    Gunakan format JSON berikut:
-    {
-      "summary": "Ringkasan hasil belajar berdasarkan materi",
-      "analysis": "Analisis area yang sudah dan belum dikuasai berdasarkan materi",
-      "advice": "Saran konkret untuk meningkatkan pemahaman",
-      "recommendation": "Rekomendasi materi tambahan atau aktivitas belajar"
+Berikan umpan balik pembelajaran yang relevan dengan materi di atas.
+Gunakan format JSON berikut:
+{
+  "summary": "Ringkasan hasil belajar berdasarkan materi",
+  "analysis": "Analisis area yang sudah dan belum dikuasai berdasarkan materi",
+  "advice": "Saran konkret untuk meningkatkan pemahaman",
+  "recommendation": "Rekomendasi materi tambahan atau aktivitas belajar"
+}
+
+Output hanya JSON valid tanpa tambahan teks lain.
+`;
+
+    let text;
+    try {
+      text = await generateAI(prompt); // ✅ REST API, hasil STRING
+    } catch (err) {
+      throw new Error("Gagal menghubungi Gemini API untuk feedback.");
     }
-
-    Output hanya JSON valid tanpa tambahan teks lain.
-    `;
-
-    const model = genAI.getGenerativeModel({ model: "models/gemini-2.0-flash" });
-    const result = await model.generateContent(prompt);
-    let text = result.response.text().replace(/```json|```/g, "").trim();
 
     let parsedFeedback;
     try {
-      parsedFeedback = JSON.parse(text);
+      parsedFeedback = JSON.parse(
+        text.replace(/```json|```/g, "").trim()
+      );
     } catch {
       parsedFeedback = {
         summary: "Asesmen selesai. Kamu menunjukkan pemahaman yang baik terhadap materi.",
         analysis: "Beberapa bagian dari materi masih bisa diperkuat, terutama yang bersifat konseptual.",
         advice: "Pelajari ulang bagian yang kurang dikuasai dan coba pahami melalui contoh nyata.",
-        recommendation: "Baca ulang materi di Redis ini dan cari contoh penerapan di dokumentasi resmi Hapi.js.",
+        recommendation: "Baca ulang materi dan cari contoh penerapan di dokumentasi resmi.",
       };
     }
 
     const feedbackKey = `feedback:${assessmentKey}:${tutorialKey}`;
     const feedbackData = {
-      feedbackKey: feedbackKey,
+      feedbackKey,
       redis_key: assessmentKey,
       materi_key: tutorialKey,
       score: Number(score),

@@ -1,15 +1,22 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { GoogleGenerativeAI } from "@google/generative-ai";
 import { nanoid } from "nanoid";
 import { redisClient } from "../config/redis.js";
 import { createQuestion, findOne } from "../models/question.js"; 
+import { generateAI } from "./generateAiService.js";
 
 import 'dotenv/config';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY, {
+//   baseUrl: "https://generativelanguage.googleapis.com/v1"
+// });
 
 export const generateAssessments = async (tutorial, user_id) => {
   try {
-    const model = genAI.getGenerativeModel({ model: process.env.MODEL });
+    // const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+
+    // console.log("GEMINI KEY:", process.env.GEMINI_API_KEY);
+    // console.log("GEMINI MODEL:", process.env.MODEL);
+    // console.log("SDK VERSION:", require("@google/generative-ai/package.json").version);
 
     const tutorialKey = `tutorial:${tutorial}`;
     const cachedTutorial = await redisClient.get(tutorialKey);
@@ -21,6 +28,7 @@ export const generateAssessments = async (tutorial, user_id) => {
     const prompt = `
     Berdasarkan materi berikut, buatkan 4 soal pilihan ganda untuk asesmen pembelajaran.
     Tiap soal harus memiliki 4 opsi jawaban (A, B, C, D) dan jelaskan alasan benar/salahnya.
+    Pastikan Kamu Membuat soal tidak keluar dari konteks materi yang aku berikan.
 
     === Materi ===
     ${cachedTutorial}
@@ -43,17 +51,17 @@ export const generateAssessments = async (tutorial, user_id) => {
 
     let result;
     try {
-      result = await model.generateContent(prompt);
+      result = await generateAI(prompt);
     } catch (apiErr) {
       console.error("Gagal memanggil Gemini API:", apiErr.message);
       throw new Error("Gagal menghubungi Gemini API — coba beberapa saat lagi.");
     }
 
-    if (!result || !result.response || typeof result.response.text !== "function") {
-      throw new Error("Respons dari Gemini API tidak valid.");
+    if (!result || typeof result !== "string") {
+      throw new Error("Respons dari Gemini API tidak valid (bukan string).");
     }
 
-    let text = result.response.text().replace(/```json|```/g, "").trim();
+    let text = result.replace(/```json|```/g, "").trim();
 
     let parsed;
     try {

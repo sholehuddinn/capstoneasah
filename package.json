@@ -10,6 +10,7 @@
     "migrate:create": "node-pg-migrate create"
   },
   "dependencies": {
+    "@google/genai": "^1.32.0",
     "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.3",
     "config": "^4.1.1",
