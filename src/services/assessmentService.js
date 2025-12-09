@@ -109,6 +109,13 @@ export const generateAssessments = async (tutorial, user_id) => {
     const redisKey = `assessment:${nanoid(6)}`;
     await redisClient.set(redisKey, JSON.stringify(remaining), { EX: 120 });
 
+    const time = new Date().toLocaleString("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour12: false,
+    });
+
+    console.log(`[AI] generate soal : ${tutorial} | Time: ${time}`);
+
     return {
       key: redisKey,
       materi_key: tutorialKey,

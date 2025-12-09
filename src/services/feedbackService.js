@@ -97,6 +97,13 @@ Output hanya JSON valid tanpa tambahan teks lain.
 
     await redisClient.set(feedbackKey, JSON.stringify(feedbackData), { EX: 3600 });
 
+    const time = new Date().toLocaleString("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour12: false,
+    });
+
+    console.log(`[AI] generate feedback: ${tutorialKey} | Time: ${time}`);
+
     return feedbackData;
   } catch (err) {
     throw err;

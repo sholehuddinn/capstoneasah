@@ -56,7 +56,10 @@ export const fetchTutorialId = async (id) => {
   try {
     const cachedTutorial = await redisClient.get(`tutorial:${id}`);
 
-    const time = new Date().toISOString();
+    const time = new Date().toLocaleString("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour12: false,
+    });
 
     console.log(`[FETCH] Tutorial ID: ${id} | Time: ${time}`);
 
