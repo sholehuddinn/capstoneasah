@@ -20,7 +20,10 @@ export const submitBulkAnswer = async (req, res) => {
       const { question_id, answer } = item;
 
       const q = await db.query(
-        `SELECT answer FROM question WHERE id = $1 LIMIT 1`,
+        `SELECT assessment, option_1, option_2, option_3, option_4, answer 
+        FROM question 
+        WHERE id = $1 
+        LIMIT 1`,
         [question_id]
       );
 
@@ -41,6 +44,13 @@ export const submitBulkAnswer = async (req, res) => {
 
       results.push({
         question_id,
+        question: q.rows[0].assessment,
+        options: {
+          A: q.rows[0].option_1,
+          B: q.rows[0].option_2,
+          C: q.rows[0].option_3,
+          D: q.rows[0].option_4,
+        },
         user_answer: answer,
         correct_answer: correctAnswer,
         is_true: isTrue,
