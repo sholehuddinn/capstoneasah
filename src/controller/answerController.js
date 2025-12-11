@@ -33,12 +33,11 @@ export const submitBulkAnswer = async (req, res) => {
       const correctAnswer = q.rows[0].answer;
       const isTrue = correctAnswer === answer;
 
-      const saved = await answerQuestion({
+      const saved = await answerQuestion(
         user_id,
         question_id,
-        answer,
-        is_true: isTrue,
-      });
+        answer
+      );
 
       results.push({
         question_id,
