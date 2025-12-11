@@ -1,6 +1,7 @@
 import { findOne } from "../models/question.js";
 import { createResult, findResultByQuestion } from "../models/result.js";
 import { nanoid } from 'nanoid';
+import { db } from "../config/db.js";
 
 export const answerQuestion = async (user_id, question_id, user_answer) => {
   const question = await db.query(
