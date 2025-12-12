@@ -21,6 +21,12 @@ export const generateAssessments = async (tutorial, user_id) => {
     const tutorialKey = `tutorial:${tutorial}`;
     const cachedTutorial = await redisClient.get(tutorialKey);
 
+    if (cachedTutorial) {
+      cachedTutorial = cachedTutorial.replace(/<[^>]+>/g, '');
+
+      cachedTutorial = cachedTutorial.replace(/\s+/g, ' ').trim();
+    }
+
     if (!cachedTutorial) {
       throw new Error("Materi tutorial tidak ditemukan atau kosong.");
     }
