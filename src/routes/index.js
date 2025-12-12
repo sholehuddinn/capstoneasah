@@ -11,13 +11,13 @@ import { editPreferenceController } from '../controller/preferenceController.js'
 import { resetProgressController } from "../controller/progressController.js"
 import { getQuestionsByUser } from "../controller/questionController.js"
 import { submitBulkAnswer } from '../controller/answerController.js';
-import { ListModel } from '../controller/tes.js';
+// import { ListModel } from '../controller/tes.js';
 
 router.get('/', (_req, res) => {
   return res.redirect('https://documenter.getpostman.com/view/45729880/2sB3WmS28v');
 });
 router.get('/test', testConnection);
-router.get('/list-models', ListModel);
+// router.get('/list-models', ListModel);
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/users', authMiddleware, getProfile);
