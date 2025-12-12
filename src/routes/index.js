@@ -17,7 +17,7 @@ router.get('/', (_req, res) => {
   return res.redirect('https://documenter.getpostman.com/view/45729880/2sB3WmS28v');
 });
 router.get('/test', testConnection);
-router.get('list-models', ListModel);
+router.get('/list-models', ListModel);
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.get('/users', authMiddleware, getProfile);
