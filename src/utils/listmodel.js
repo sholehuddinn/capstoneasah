@@ -16,4 +16,4 @@ async function listModels() {
   }
 }
 
-listModels()
+export default listModels

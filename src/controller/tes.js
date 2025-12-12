@@ -1,5 +1,6 @@
 import { redisClient } from '../config/redis.js';
 import { db } from '../config/db.js';
+import { listModels } from '../utils/listmodel.js'
 
 export const testConnection = async (_req, res) => {
   try {
@@ -17,3 +18,13 @@ export const testConnection = async (_req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const ListModel = async (_req, res) => {
+  try {
+    res.json({
+      listModels
+    })
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+  }
+}
