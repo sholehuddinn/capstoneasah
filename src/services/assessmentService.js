@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { redisClient } from "../config/redis.js";
 import { createQuestion, findOne } from "../models/question.js"; 
 import { generateAI } from "./generateAiService.js";
+import { createExplanationModel } from "../models/explanation.js"
 
 import 'dotenv/config';
 
@@ -123,6 +124,14 @@ export const generateAssessments = async (tutorial, user_id) => {
         option_4: firstQuestion.multiple_choice[3].option,
         answer:
           firstQuestion.multiple_choice.find((m) => m.correct)?.id.toString() ?? "1",
+      });
+
+      await createExplanationModel({
+        question_id: firstQuestion.id,
+        explanation_1: firstQuestion.multiple_choice[0].explanation,
+        explanation_2: firstQuestion.multiple_choice[1].explanation,
+        explanation_3: firstQuestion.multiple_choice[2].explanation,
+        explanation_4: firstQuestion.multiple_choice[3].explanation,
       });
     }
 

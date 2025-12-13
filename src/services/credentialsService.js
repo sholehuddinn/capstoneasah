@@ -28,6 +28,13 @@ export const updateCredentialsService = async (name, payload) => {
 
   const updated = await updateCredentials(name, payload);
 
+  const time = new Date().toLocaleString("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour12: false,
+    });
+
+  console.log(`[KEY] di ganti | Time: ${time}`);
+
   if (!updated) {
     throw new Error("Credentials tidak ditemukan");
   }
