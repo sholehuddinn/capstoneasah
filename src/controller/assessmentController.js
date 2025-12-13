@@ -1,4 +1,4 @@
-import { generateAssessments } from "../services/assessmentService.js";
+import { generateAssessments, getAssessmentId } from "../services/assessmentService.js";
 // import { verifyProgress } from "../models/progress.js";
 
 export const createAssessment = async (req, res) => {
@@ -31,6 +31,24 @@ export const createAssessment = async (req, res) => {
       success: false,
       error: "Terjadi kesalahan saat membuat asesmen.",
       details: err.message || "Unknown error",
+    });
+  }
+};
+
+export const getAssessmentByIdController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const data = await getAssessmentId(id);
+
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
     });
   }
 };

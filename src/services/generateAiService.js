@@ -1,14 +1,21 @@
 import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY
-});
+import { getCredentialsByNameService } from "./credentialsService.js";
 
 export async function generateAI(prompt) {
   try {
+    const credential = await getCredentialsByNameService("GEMINI_API_KEY");
+
+    if (!credential?.credentials) {
+      throw new Error("GEMINI API KEY tidak ditemukan");
+    }
+
+    const ai = new GoogleGenAI({
+      apiKey: credential.credentials,
+    });
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: prompt
+      contents: prompt,
     });
 
     return response.text;

@@ -6,6 +6,26 @@ import { generateAI } from "./generateAiService.js";
 
 import 'dotenv/config';
 
+export const cleanHtmlContent = (html) => {
+  if (!html || typeof html !== "string") return "";
+
+  return html
+    // 1. Hapus iframe beserta isinya
+    .replace(/<iframe[\s\S]*?<\/iframe>/gi, "")
+    // 2. Hapus script & style (opsional tapi aman)
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    // 3. Hapus semua tag HTML lainnya
+    .replace(/<[^>]+>/g, "")
+    // 4. Decode HTML entity sederhana
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    // 5. Rapikan spasi
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+
 // const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY, {
 //   baseUrl: "https://generativelanguage.googleapis.com/v1"
 // });
@@ -19,13 +39,9 @@ export const generateAssessments = async (tutorial, user_id) => {
     // console.log("SDK VERSION:", require("@google/generative-ai/package.json").version);
 
     const tutorialKey = `tutorial:${tutorial}`;
-    const cachedTutorial = await redisClient.get(tutorialKey);
-
-    // if (cachedTutorial) {
-    //   cachedTutorial = cachedTutorial.replace(/<[^>]+>/g, '');
-
-    //   cachedTutorial = cachedTutorial.replace(/\s+/g, ' ').trim();
-    // }
+    let cachedTutorial = await redisClient.get(tutorialKey);
+ 
+    cachedTutorial = cleanHtmlContent(cachedTutorial);
 
     if (!cachedTutorial) {
       throw new Error("Materi tutorial tidak ditemukan atau kosong.");
@@ -113,7 +129,7 @@ export const generateAssessments = async (tutorial, user_id) => {
     const remaining = data.slice(1); 
 
     const redisKey = `assessment:${nanoid(6)}`;
-    await redisClient.set(redisKey, JSON.stringify(remaining), { EX: 120 });
+    await redisClient.set(redisKey, JSON.stringify(remaining), { EX: 7200 });
 
     const time = new Date().toLocaleString("id-ID", {
       timeZone: "Asia/Jakarta",
@@ -128,6 +144,25 @@ export const generateAssessments = async (tutorial, user_id) => {
       data: remaining,
     };
   } catch (err) {
-    throw err;
+    return err.message;
+  }
+};
+
+export const getAssessmentId = async (id) => {
+  try {
+    if (!id) {
+      throw new Error("Assessment ID wajib diisi");
+    }
+
+    const redisKey = `assessment:${id}`;
+    const data = await redisClient.get(redisKey);
+
+    if (!data) {
+      throw new Error("Assessment tidak ditemukan atau sudah kadaluarsa");
+    }
+
+    return JSON.parse(data);
+  } catch (error) {
+    throw error; 
   }
 };
