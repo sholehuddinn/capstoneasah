@@ -31,24 +31,20 @@ export const getPreferenceByUserId = async (user_id) => {
 
 export const updatePreference = async (fields, values, userId) => {
   try {
-    const safeFields = fields.filter(
-      f => !f.startsWith("id =") && !f.startsWith("user_id =")
-    );
-
-    if (safeFields.length === 0) {
-      throw new Error("No valid fields to update");
-    }
+    const setQuery = fields.join(", ");
+    const index = values.length + 1; 
 
     const query = `
       UPDATE preference
-      SET ${safeFields.join(", ")}
-      WHERE user_id = $${values.length + 1}
+      SET ${setQuery}
+      WHERE user_id = $${index}
       RETURNING *;
     `;
 
-    return await db.query(query, [...values, userId]);
+    const result = await db.query(query, [...values, userId]);
+    return result;
   } catch (error) {
-    console.error("Error in updatePreference:", error.message);
+    console.error("Error in updatePreference:", error);
     throw error;
   }
 };
