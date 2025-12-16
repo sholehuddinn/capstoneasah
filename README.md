@@ -56,7 +56,15 @@ docker exec -it bun_app bash
 Setelah berada di dalam container, jalankan migration:
 
 ```sh
-bun migrate_up
+bun migrate:up
+```
+
+Kalo tidak bisa maka bisa install npm/node js di kontener nya
+
+```sh
+apt update
+apt install -y nodejs npm
+npm run migrate:up
 ```
 
 
@@ -73,7 +81,7 @@ bun migrate_down
 Jika ingin melihat log container:
 
 ```sh
-docker logs -f bun_app
+docker logs bun_app
 ```
 
 ---
