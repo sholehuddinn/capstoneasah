@@ -14,7 +14,7 @@ export async function generateAI(prompt) {
     });
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-lite-001",
+      model: "gemini-2.5-flash",
       contents: prompt,
     });
 
