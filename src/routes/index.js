@@ -33,5 +33,6 @@ router.get('/questions-final', authMiddleware, getQuestionsByUser);
 router.post('/submit-answers', authMiddleware,  submitBulkAnswer);
 router.post('/credentials', authMiddleware, createCredentialsController)
 router.put('/credentials', authMiddleware, updateCredentialsController)
+router.get('/iframe/tutorial/:tutorial_id', createAssessment);
 
 export default router;
