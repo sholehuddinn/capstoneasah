@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 
 import { testConnection } from '../controller/tes.js';
-import { createAssessment, getAssessmentByIdController } from '../controller/assessmentController.js';
+import { createAssessment, getAssessmentByIdController, createAssessmentIframe } from '../controller/assessmentController.js';
 import { handleFeedback } from '../controller/feedbackController.js';
 import { getTutorialId, getTutorials } from '../controller/tutorialController.js';
 import { registerUser, loginUser, getProfile } from '../controller/userController.js';
@@ -33,7 +33,7 @@ router.get('/questions-final', authMiddleware, getQuestionsByUser);
 router.post('/submit-answers', authMiddleware,  submitBulkAnswer);
 router.post('/credentials', authMiddleware, createCredentialsController)
 router.put('/credentials', authMiddleware, updateCredentialsController)
-router.get('/iframe/soal/:tutorial_id', createAssessment);
+router.get('/iframe/soal/:tutorial_id', createAssessmentIframe);
 router.get('/iframe/tutorial/:id', getTutorialId);
 
 export default router;

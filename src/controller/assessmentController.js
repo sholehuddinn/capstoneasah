@@ -1,5 +1,6 @@
-import { generateAssessments, getAssessmentId } from "../services/assessmentService.js";
+import { generateAssessments, getAssessmentId, generateAssessmentsIframe } from "../services/assessmentService.js";
 // import { verifyProgress } from "../models/progress.js";
+import { fetchTutorialId } from "../services/tutorialService.js"
 
 export const createAssessment = async (req, res) => {
   try {
@@ -15,6 +16,41 @@ export const createAssessment = async (req, res) => {
     // }
 
     const result = await generateAssessments(tutorial_id, user_id);
+
+    return res.status(200).json({
+      success: true,
+      assessment_id: result.key,
+      materi_id: result.materi_key,
+      expires_in: "120s",
+      total: result.count,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error("Error di controller:", err);
+
+    return res.status(500).json({
+      success: false,
+      error: "Terjadi kesalahan saat membuat asesmen.",
+      details: err.message || "Unknown error",
+    });
+  }
+};
+
+export const createAssessmentIframe = async (req, res) => {
+  try {
+    const { tutorial_id } = req.params;
+
+    await fetchTutorialId(tutorial_id);
+
+    // const verif = await verifyProgress(user_id, tutorial_id);
+    //  if (!verif) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     error: "Kamu belum menyelesaikan tutorial sebelumnya.",
+    //   });
+    // }
+
+    const result = await generateAssessmentsIframe(tutorial_id);
 
     return res.status(200).json({
       success: true,
