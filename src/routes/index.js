@@ -33,6 +33,8 @@ router.get('/questions-final', authMiddleware, getQuestionsByUser);
 router.post('/submit-answers', authMiddleware,  submitBulkAnswer);
 router.post('/credentials', authMiddleware, createCredentialsController)
 router.put('/credentials', authMiddleware, updateCredentialsController)
+
+router.post('/iframe/submit/tutorial/:tutorial_id/assessment/:assessment_id', handleFeedback);
 router.get('/iframe/soal/:tutorial_id', createAssessmentIframe);
 router.get('/iframe/tutorial/:id', getTutorialId);
 
